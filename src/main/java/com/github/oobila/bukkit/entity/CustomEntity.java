@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.experimental.Delegate;
 import org.bukkit.entity.Entity;
 
-class CustomEntity <T extends Entity> implements Entity {
+class CustomEntity<T extends Entity> implements Entity {
 
     @Delegate(types = Entity.class) @Getter(AccessLevel.PACKAGE)
     private final T entity;

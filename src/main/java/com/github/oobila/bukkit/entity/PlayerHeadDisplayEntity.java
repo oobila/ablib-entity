@@ -7,13 +7,12 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.inventory.ItemStack;
 
-public class PlayerHeadDisplayEntity extends NodeEntity<ItemDisplay, PlayerHeadDisplayEntity> implements ItemDisplay {
+public class PlayerHeadDisplayEntity<T extends PlayerHeadDisplayEntity<T>> extends NodeEntity<ItemDisplay, T> implements ItemDisplay {
 
     @Delegate(types = ItemDisplay.class, excludes = Entity.class)
     private final ItemDisplay itemDisplay;
 
-    public PlayerHeadDisplayEntity(Location location, ItemStack nonPlayerSkull,
-                            CustomEntityBehaviour<PlayerHeadDisplayEntity> behaviour) {
+    public PlayerHeadDisplayEntity(Location location, ItemStack nonPlayerSkull, CustomEntityBehaviour<T> behaviour) {
         super((ItemDisplay) location.getWorld().spawnEntity(location, EntityType.ITEM_DISPLAY), behaviour);
         this.itemDisplay = getEntity();
         setItemStack(nonPlayerSkull);
