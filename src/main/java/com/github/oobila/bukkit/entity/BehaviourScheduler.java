@@ -4,7 +4,6 @@ import com.github.oobila.bukkit.common.ABCommon;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.entity.Entity;
 
 import javax.management.InstanceAlreadyExistsException;
 import java.util.HashMap;
@@ -18,9 +17,9 @@ public class BehaviourScheduler {
     @Setter(AccessLevel.PRIVATE) @Getter(AccessLevel.PRIVATE)
     private static BehaviourScheduler instance = null;
 
-    private final Map<Integer, Map<UUID, NodeEntity<?>>> behaviourTickMap = new HashMap<>();
+    private final Map<Integer, Map<UUID, NodeEntity<?, ?>>> behaviourTickMap = new HashMap<>();
     private boolean shouldRegisterEntities;
-    private final Set<NodeEntity<?>> stagingRegister = new HashSet<>();
+    private final Set<NodeEntity<?, ?>> stagingRegister = new HashSet<>();
     private boolean shouldRemoveEntities;
     private final Map<Integer, Set<UUID>> stagingRemove = new HashMap<>();
     private int tick = 0;
@@ -41,7 +40,7 @@ public class BehaviourScheduler {
                 shouldRegisterEntities = false;
             }
 
-            for (Map.Entry<Integer, Map<UUID, NodeEntity<?>>> entry : behaviourTickMap.entrySet()) {
+            for (Map.Entry<Integer, Map<UUID, NodeEntity<?, ?>>> entry : behaviourTickMap.entrySet()) {
                 if (tick % entry.getKey() == 0) {
                     //perform behaviour
                     entry.getValue().values().forEach(entity -> entity.getBehaviour().onNextTick());
@@ -65,13 +64,13 @@ public class BehaviourScheduler {
         instance = null;
     }
 
-    static <T extends Entity> void registerNodeEntity(NodeEntity<T> nodeEntity) {
+    static void registerNodeEntity(NodeEntity<?, ?> nodeEntity) {
         instance.stagingRegister.add(nodeEntity);
         instance.shouldRegisterEntities = true;
         instance.behaviourTickMap.computeIfAbsent(nodeEntity.getBehaviour().getTickSpacing(), i -> new HashMap<>());
     }
 
-    public static <T extends Entity> void remove(NodeEntity<T> nodeEntity) {
+    public static void remove(NodeEntity<?, ?> nodeEntity) {
         instance.stagingRemove.computeIfAbsent(nodeEntity.getBehaviour().getTickSpacing(), i -> new HashSet<>());
         instance.stagingRemove.get(nodeEntity.getBehaviour().getTickSpacing()).add(nodeEntity.getUniqueId());
         instance.shouldRemoveEntities = true;

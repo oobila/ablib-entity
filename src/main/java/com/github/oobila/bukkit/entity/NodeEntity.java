@@ -15,39 +15,39 @@ import java.util.Map;
 import java.util.UUID;
 
 @Getter
-public abstract class NodeEntity<T extends Entity> extends CustomEntity<T> {
+public abstract class NodeEntity<T extends Entity, S extends NodeEntity<T,S>> extends CustomEntity<T> {
 
     @Getter(AccessLevel.PROTECTED)
-    private NodeEntity<?> parent;
+    private NodeEntity<?, ?> parent;
     @Getter(AccessLevel.PROTECTED)
-    private final Map<UUID, NodeEntity<Entity>> children = new HashMap<>();
+    private final Map<UUID, NodeEntity<?, ?>> children = new HashMap<>();
     private Vector offset;
     private EulerAngle angle;
-    private CustomEntityBehaviour<NodeEntity<T>> behaviour;
+    private CustomEntityBehaviour<S> behaviour;
 
-    protected NodeEntity(T entity, CustomEntityBehaviour<NodeEntity<T>> behaviour) {
+    protected NodeEntity(T entity, CustomEntityBehaviour<S> behaviour) {
         super(entity);
         if(behaviour != null){
             this.behaviour = behaviour;
-            this.behaviour.setNodeEntity(this);
+            this.behaviour.setNodeEntity((S) this);
             BehaviourScheduler.registerNodeEntity(this);
         }
     }
 
-    public void attachChild(NodeEntity<Entity> child, Vector offset, EulerAngle angle){
+    public void attachChild(NodeEntity<?, ?> child, Vector offset, EulerAngle angle){
         children.put(child.getUniqueId(), child);
         child.parent = this;
         child.offset = offset;
         child.angle = angle;
     }
 
-    public NodeEntity<Entity> detachChild(UUID id){
-        NodeEntity<Entity> r = children.remove(id);
+    public NodeEntity<?, ?> detachChild(UUID id){
+        NodeEntity<?, ?> r = children.remove(id);
         r.parent = null;
         return r;
     }
 
-    public NodeEntity<Entity> detachChild(NodeEntity<Entity> child){
+    public NodeEntity<?, ?> detachChild(NodeEntity<?, ?> child){
         return detachChild(child.getUniqueId());
     }
 
